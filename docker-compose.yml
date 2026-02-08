@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  proxy-gateway:
+    image: ton-proxy-client
+    container_name: ton-proxy-gateway
+    ports:
+      - 3333:3333
+      - 9080:8080
+    volumes:
+      - ./global.config.json:/ton-proxy/global.config.json
+      - ./keyring:/ton-proxy/keyring
+    env_file:
+      - main.env # will be created through prepare.sh
