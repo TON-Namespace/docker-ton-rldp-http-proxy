@@ -8,7 +8,7 @@ Dockerized [TON RLDP-HTTP-Proxy](https://github.com/ton-blockchain/ton) — an H
 
 ## How It Works
 
-The container runs the official `rldp-http-proxy` binary from [ton-blockchain/ton](https://github.com/ton-blockchain/ton). It connects to the TON network via liteservers (configured through `global.config.json`), resolves `.ton` domain names via TON DNS, and fetches site content over the RLDP protocol. Locally it exposes an HTTP proxy on port `8080` (mapped to `9080` on the host by default) that you can point your browser or `curl` at.
+The container runs the official `rldp-http-proxy` binary from [ton-blockchain/ton](https://github.com/ton-blockchain/ton). It connects to the TON network via liteservers (configured through `global.config.json`), resolves `.ton` domain names via TON DNS, and fetches site content over the RLDP protocol. Locally it exposes an HTTP proxy on port `8080` that you can point your browser or `curl` at.
 
 ---
 
@@ -96,12 +96,35 @@ You should see output like the proxy connecting to liteservers and starting to l
 Test the proxy with `curl` by requesting a `.ton` website through it. For example, to open `tonnel.ton`:
 
 ```bash
-curl -x localhost:9080 http://tonnel.ton
+curl -x localhost:8080 http://tonnel.ton
 ```
 
-> **Note:** The host port is `9080` (mapped from container port `8080` in `docker-compose.yml`). If you changed the port mapping, adjust accordingly.
+> **Note:** The default host port is `8080` (mapped from container port `8080` in `docker-compose.yml`). If you changed the port mapping, adjust accordingly.
 
 If you get back HTML content, the proxy is working correctly.
+
+### Step 7 (Optional): Browse `.ton` Sites in Your Browser (Windows)
+
+Instead of using `curl`, you can configure Windows to route all HTTP traffic through the proxy so you can open `.ton` websites directly in Chrome, Edge, or any other browser.
+
+1. Open the Start menu and search for **"Proxy settings"**:
+
+   ![Search for Proxy settings in Windows Start menu](https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-sxERzWMQSpxltRwqGCXzXaeZsoz10E.png)
+
+2. In the **Proxy** settings page, scroll down to **Manual proxy setup** and configure it:
+   - Toggle **"Use a proxy server"** to **On**
+   - **Address**: Enter your server's IP address (use `127.0.0.1` if the proxy runs on the same machine, or the server's public IP if it runs remotely)
+   - **Port**: `8080`
+   - Check **"Don't use the proxy server for local (intranet) addresses"**
+   - Click **Save**
+
+   ![Windows Manual Proxy Setup showing address and port 8080](https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-BKLhsRfSU60uTxAxX04v7p9HbjdhIM.png)
+
+3. Open your browser and navigate to any `.ton` website, for example `http://tonnel.ton`. You should see the site load normally:
+
+   ![tonnel.ton loaded in Chrome through the TON proxy](https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-CRgGoo9Z73aUGSI8pVaO7F3Jc7zFn2.png)
+
+> **Important:** While the Windows proxy is enabled, **all** your HTTP traffic will be routed through the TON proxy. Regular websites will still work, but if you experience slowdowns, disable the proxy in settings when you are not browsing `.ton` sites.
 
 ---
 
@@ -109,7 +132,7 @@ If you get back HTML content, the proxy is working correctly.
 
 | Port | Protocol | Description |
 |------|----------|-------------|
-| `8080` (container) / `9080` (host) | TCP | HTTP proxy endpoint — point your browser or `curl` here |
+| `8080` | TCP | HTTP proxy endpoint — point your browser or `curl` here |
 | `3333` | UDP | ADNL port — used for TON network peer-to-peer communication |
 
 Make sure port `3333/udp` is open on your firewall/security group so the proxy can communicate with the TON network.
